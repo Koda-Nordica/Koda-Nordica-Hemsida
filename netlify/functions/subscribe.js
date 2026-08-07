@@ -1,7 +1,3 @@
-// Netlify Function
-// Denna fil ska ligga i: netlify/functions/subscribe.js (i repots rot)
-// Den blir automatiskt tillgänglig på: /.netlify/functions/subscribe
-
 exports.handler = async (event) => {
   const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
@@ -20,41 +16,105 @@ exports.handler = async (event) => {
     };
   }
 
+  if (event.httpMethod !== "POST") {
+    return {
+      statusCode: 405,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "Method not allowed" }),
+    };
+  }
+
   let email;
   try {
-    const body = JSON.parse(event.body);
-    email = body.email;
+    const body = JSON.parse(event.body || "{}");
+    email = (body.email || "").trim();
   } catch {
-    return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: "Ogiltig förfrågan" }) };
+    return {
+      statusCode: 400,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "Ogiltig förfrågan" }),
+    };
   }
 
   if (!email || !email.includes("@")) {
-    return { statusCode: 400, headers: corsHeaders, body: JSON.stringify({ error: "Ogiltig e-postadress" }) };
+    return {
+      statusCode: 400,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "Ogiltig e-postadress" }),
+    };
   }
 
-  // BREVO_LIST_ID: byt ut mot ditt riktiga List ID (siffra, hittas i Brevo under Contacts > Lists)
-  const BREVO_LIST_ID = 5;
+  const BREVO_LIST_ID = 5; // ← byt till ditt riktiga List ID
+  const apiKey = process.env.BREVO_API_KEY;
+
+  if (!apiKey) {
+    console.error("BREVO_API_KEY saknas i miljövariabler");
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "Serverkonfiguration saknas" }),
+    };
+  }
 
   try {
     const res = await fetch("https://api.brevo.com/v3/contacts", {
       method: "POST",
       headers: {
-        "api-key": process.env.BREVO_API_KEY,
+        "api-key": apiKey,
         "Content-Type": "application/json",
+        "Accept": "application/json",
       },
       body: JSON.stringify({
-        email: email,
+        email,
         listIds: [BREVO_LIST_ID],
         updateEnabled: true,
       }),
     });
 
-    if (!res.ok && res.status !== 400) {
-      return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: "Kunde inte lägga till kontakten" }) };
+    const responseText = await res.text();
+    let data = {};
+    try {
+      data = JSON.parse(responseText);
+    } catch {}
+
+    console.log("Brevo status:", res.status, data);
+
+    // 201 = skapad, 204 = uppdaterad
+    if (res.ok || res.status === 201 || res.status === 204) {
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ success: true }),
+      };
     }
 
-    return { statusCode: 200, headers: corsHeaders, body: JSON.stringify({ success: true }) };
+    // Redan finns → behandla som success
+    if (
+      res.status === 400 &&
+      (data.code === "duplicate_parameter" ||
+        (responseText && responseText.toLowerCase().includes("already")))
+    ) {
+      return {
+        statusCode: 200,
+        headers: corsHeaders,
+        body: JSON.stringify({ success: true, message: "Redan registrerad" }),
+      };
+    }
+
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({
+        error: "Kunde inte lägga till kontakten",
+        details: data.message || data.code || responseText || "Okänt fel",
+      }),
+    };
   } catch (err) {
-    return { statusCode: 500, headers: corsHeaders, body: JSON.stringify({ error: "Serverfel" }) };
+    console.error("Function error:", err);
+    return {
+      statusCode: 500,
+      headers: corsHeaders,
+      body: JSON.stringify({ error: "Serverfel", details: err.message }),
+    };
   }
 };
