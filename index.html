@@ -624,13 +624,13 @@
   <svg class="paw-deco md" style="top:12%; left:8%; transform:rotate(-8deg);" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="17.5" rx="5.2" ry="4.2"/><circle cx="5.5" cy="10" r="2.6"/><circle cx="9.5" cy="6.5" r="2.6"/><circle cx="14.5" cy="6.5" r="2.6"/><circle cx="18.5" cy="10" r="2.6"/></svg>
   <svg class="paw-deco lg" style="bottom:10%; right:6%; transform:rotate(10deg);" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><ellipse cx="12" cy="17.5" rx="5.2" ry="4.2"/><circle cx="5.5" cy="10" r="2.6"/><circle cx="9.5" cy="6.5" r="2.6"/><circle cx="14.5" cy="6.5" r="2.6"/><circle cx="18.5" cy="10" r="2.6"/></svg>
   <div class="wrap">
-    <h2 class="serif">Bli en av de första.</h2>
-    <p>Koda Nordica lanseras inom kort. Lämna din mejl så hör du av oss så fort Oxlunga finns att beställa.</p>
+    <h2 class="serif">Var med från start.</h2>
+    <p>Anmäl din e-post och få <strong>10% rabatt</strong> på din första beställning — en rabattkod skickas direkt till dig, redo att använda så fort Oxlunga finns att beställa.</p>
     <form class="signup-form" onsubmit="return false;">
       <input type="email" placeholder="din@mejl.se" required>
-      <button type="submit">Håll mig uppdaterad</button>
+      <button type="submit">Få min rabattkod</button>
     </form>
-    <div class="signup-note">Vi skickar aldrig spam. Bara en hälsning när vi lanserar.</div>
+    <div class="signup-note">Vi skickar aldrig spam. Bara din rabattkod och en hälsning när vi lanserar.</div>
   </div>
 </section>
 
@@ -690,6 +690,58 @@
     entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); } });
   }, {threshold:0.15});
   revealEls.forEach(el=>obs.observe(el));
+
+  // Brevo-koppling för anmälningsformuläret
+  const signupForm = document.querySelector('.signup-form');
+  if (signupForm) {
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const input = e.target.querySelector('input[type="email"]');
+      const btn = e.target.querySelector('button');
+      const email = input.value.trim();
+      const originalText = btn.textContent;
+
+      if (!email || !email.includes('@')) {
+        btn.textContent = "Ogiltig e-post";
+        setTimeout(() => { btn.textContent = originalText; }, 2500);
+        return;
+      }
+
+      btn.textContent = "Skickar...";
+      btn.disabled = true;
+
+      // Provar Cloudflare Pages Functions-vägen först, sen Netlify som reserv
+      const endpoints = ["/subscribe", "/.netlify/functions/subscribe"];
+      let success = false;
+
+      for (const endpoint of endpoints) {
+        try {
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email })
+          });
+          if (res.ok) {
+            success = true;
+            break;
+          }
+        } catch {
+          // gå vidare och prova nästa endpoint
+        }
+      }
+
+      if (success) {
+        btn.textContent = "Tack! Din rabattkod är på väg ✓";
+        input.value = "";
+      } else {
+        btn.textContent = "Något gick fel, försök igen";
+      }
+
+      btn.disabled = false;
+      setTimeout(() => { btn.textContent = originalText; }, 3500);
+    });
+  }
 </script>
 
 </body>
