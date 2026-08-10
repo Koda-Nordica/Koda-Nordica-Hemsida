@@ -1,0 +1,24 @@
+{
+  "name": "Koda Nordica",
+  "short_name": "Koda Nordica",
+  "description": "Premium hundgodis av 100% svenska råvaror. Lufttorkat, rent och utan tillsatser.",
+  "start_url": "/",
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "theme_color": "#35402F",
+  "background_color": "#F2E7DD",
+  "display": "standalone",
+  "lang": "sv"
+}
