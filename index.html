@@ -444,13 +444,13 @@
   .product-card{
     display:grid; grid-template-columns:1.1fr 0.95fr; gap:0;
     background:transparent; border:none; border-radius:0;
-    overflow:hidden; box-shadow:none;
-    align-items:stretch;
+    overflow:visible; box-shadow:none;
+    align-items:start;
   }
   .product-media{
     position:relative; background:transparent;
-    display:flex; align-items:stretch; justify-content:center;
-    padding:0; min-height:0; height:100%;
+    display:flex; align-items:flex-start; justify-content:center;
+    padding:0; min-height:0; height:auto; align-self:start;
   }
   .product-media .frame{
     background:transparent; padding:0; border-radius:0;
@@ -458,10 +458,13 @@
   }
   .product-media img,
   .product-gallery .gallery-main{
-    width:100%; height:100%; min-height:420px;
+    width:100%; height:auto; min-height:0;
     object-fit:cover; object-position:center center;
     border-radius:0; display:block;
     aspect-ratio:1 / 1;
+  }
+  .product-gallery{
+    width:100%; position:relative; overflow:hidden;
   }
   .product-tag{
     position:absolute; top:22px; left:22px; z-index:2;
@@ -573,9 +576,9 @@
 
 
   /* ---------- Product gallery ---------- */
-  .product-gallery{position:relative; width:100%; height:100%; min-height:420px; background:transparent; overflow:hidden;}
+  .product-gallery{position:relative; width:100%; height:auto; min-height:0; background:transparent; overflow:hidden;}
   .product-gallery .gallery-main{
-    width:100%; height:100%; min-height:420px; object-fit:cover; object-position:center;
+    width:100%; height:auto; min-height:0; object-fit:cover; object-position:center;
     display:block; border:none; aspect-ratio:1 / 1;
   }
   .gallery-nav{
@@ -607,37 +610,39 @@
   }
   .product-price span{font-size:0.95rem; color:var(--forest-soft); font-family:'Work Sans',sans-serif; margin-left:6px;}
   .buy-row{
-    display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:18px;
+    display:flex; flex-wrap:nowrap; gap:12px; align-items:stretch; margin-bottom:18px;
   }
   .qty-control{
-    display:inline-flex; align-items:center; border:1px solid var(--line);
-    border-radius:2px; overflow:hidden; background:#fff;
+    display:inline-flex; align-items:stretch; border:1px solid var(--line);
+    border-radius:2px; overflow:hidden; background:#fff; flex-shrink:0;
   }
   .qty-control button{
-    width:40px; height:44px; border:none; background:transparent;
-    color:var(--forest); font-size:1.1rem; cursor:pointer;
-    transition:background .15s;
+    width:44px; min-height:48px; border:none; background:transparent;
+    color:var(--forest); font-size:1.15rem; cursor:pointer;
+    transition:background .15s; line-height:1;
   }
   .qty-control button:hover{background:var(--cream-deep);}
   .qty-control input{
-    width:44px; height:44px; border:none; border-left:1px solid var(--line); border-right:1px solid var(--line);
-    text-align:center; font-size:0.95rem; color:var(--ink); background:#fff;
+    width:48px; min-height:48px; border:none; border-left:1px solid var(--line); border-right:1px solid var(--line);
+    text-align:center; font-size:1rem; color:var(--ink); background:#fff;
+    font-family:'Work Sans',sans-serif; font-weight:500;
     -moz-appearance:textfield;
   }
   .qty-control input::-webkit-outer-spin-button,
   .qty-control input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0;}
   .btn-add-cart{
-    flex:1; min-width:160px; height:44px;
+    flex:1; min-width:0; min-height:48px; height:auto;
     background:var(--forest); color:var(--cream);
     border:none; border-radius:2px; cursor:pointer;
-    font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; font-weight:600;
+    font-size:0.8rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:600;
     font-family:'Work Sans',sans-serif;
+    padding:14px 18px;
     transition:background .2s, transform .15s;
   }
   .btn-add-cart:hover{background:var(--forest-deep);}
   .btn-add-cart:active{transform:scale(0.98);}
 
-  .nutri-accordion{margin-top:8px; border-top:1px solid var(--line);}
+  .nutri-accordion{margin-top:0; border-top:1px solid var(--line);}
   .nutri-accordion summary{
     list-style:none; cursor:pointer; padding:14px 0;
     font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase;
@@ -649,6 +654,76 @@
   .nutri-accordion[open] summary::after{content:"–";}
   .nutri-accordion .nutri{margin:0 0 12px; padding-top:0;}
   .nutri-accordion .weight{margin-bottom:8px; font-size:0.85rem; color:var(--forest-soft);}
+  .nutri-accordion .accordion-body{
+    padding:0 0 16px; font-size:0.9rem; line-height:1.65; color:var(--forest-soft);
+  }
+  .nutri-accordion .accordion-body p{margin:0 0 8px;}
+  .nutri-accordion .accordion-body p:last-child{margin-bottom:0;}
+  .nutri-accordion .accordion-body strong{color:var(--forest); font-weight:600;}
+
+  /* Toast */
+  .koda-toast{
+    position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-12px);
+    background:var(--forest); color:var(--cream);
+    padding:14px 22px; border-radius:2px;
+    font-size:0.88rem; letter-spacing:0.02em;
+    box-shadow:0 12px 32px rgba(38,46,32,0.25);
+    z-index:400; opacity:0; pointer-events:none;
+    transition:opacity .3s ease, transform .3s ease;
+    max-width:min(420px, calc(100% - 32px)); text-align:center;
+  }
+  .koda-toast.show{opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto;}
+  @media(min-width:901px){
+    .koda-toast{
+      left:auto; right:24px; transform:translateY(-12px);
+    }
+    .koda-toast.show{transform:translateY(0);}
+  }
+
+  /* Cart shipping rows */
+  .cart-summary-rows{margin-bottom:14px;}
+  .cart-summary-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:0.9rem; color:var(--forest-soft); margin-bottom:8px;
+  }
+  .cart-summary-row[hidden]{display:none !important;}
+  .cart-promo-msg:empty{display:none;}
+  .cart-summary-row.total-row{
+    margin-top:10px; padding-top:12px; border-top:1px solid var(--line);
+    font-size:1rem; color:var(--forest);
+  }
+  .cart-summary-row.total-row strong{
+    font-family:'Alice',serif; font-size:1.35rem; font-weight:400;
+  }
+  .cart-shipping-note{
+    font-size:0.8rem; color:var(--kraft-deep); margin:0 0 14px; line-height:1.5;
+  }
+  .cart-shipping-note.free{color:var(--forest); font-weight:500;}
+  .cart-promo{
+    display:flex; gap:8px; margin:0 0 14px; align-items:stretch;
+  }
+  .cart-promo input{
+    flex:1; min-width:0; height:42px; padding:0 12px;
+    border:1px solid var(--line); border-radius:2px;
+    background:#fff; color:var(--ink); font-size:0.88rem;
+    font-family:'Work Sans',sans-serif;
+  }
+  .cart-promo input:focus{outline:none; border-color:var(--forest);}
+  .cart-promo button{
+    height:42px; padding:0 14px; border:none; border-radius:2px; cursor:pointer;
+    background:var(--forest); color:var(--cream);
+    font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:600;
+    font-family:'Work Sans',sans-serif; white-space:nowrap;
+  }
+  .cart-promo button:hover{background:var(--forest-deep);}
+  .cart-promo-msg{
+    font-size:0.78rem; margin:-6px 0 12px; min-height:1.2em;
+    color:var(--forest-soft);
+  }
+  .cart-promo-msg.ok{color:var(--forest);}
+  .cart-promo-msg.err{color:#8b3a2a;}
+  .cart-summary-row .strike{text-decoration:line-through; opacity:0.55; margin-right:6px;}
+
 
   /* ---------- Cart icon in nav ---------- */
   .cart-btn{
@@ -739,9 +814,28 @@
     .gallery-arrow{width:36px; height:36px;}
   }
   @media(max-width:480px){
-    .buy-row{flex-direction:column; align-items:stretch;}
-    .btn-add-cart{width:100%;}
+    .buy-row{
+      flex-direction:column; align-items:stretch; gap:10px;
+    }
+    .qty-control{
+      width:100%; justify-content:space-between;
+    }
+    .qty-control button{
+      width:56px; min-height:52px; font-size:1.25rem;
+    }
+    .qty-control input{
+      flex:1; width:auto; min-height:52px; font-size:1.05rem;
+    }
+    .btn-add-cart{
+      width:100%; min-height:52px; font-size:0.85rem;
+      letter-spacing:0.1em; padding:16px 20px;
+    }
     .cart-drawer{width:100%;}
+  }
+  @media(max-width:900px) and (min-width:481px){
+    .buy-row{flex-wrap:nowrap;}
+    .btn-add-cart{min-height:50px; font-size:0.82rem;}
+    .qty-control button, .qty-control input{min-height:50px;}
   }
 
   /* ---------- Email popup modal ---------- */
@@ -1029,7 +1123,7 @@
       <div class="product-media">
         <span class="product-tag btn-pulse">Lanseras snart</span>
         <div class="product-gallery" id="productGallery">
-          <img class="gallery-main" id="galleryMain" src="product-oxlunga.jpg" alt="Koda Nordica Oxlunga hundgodis 100 g" width="1400" height="1400">
+          <img class="gallery-main" id="galleryMain" src="product-oxlunga.jpg" alt="Koda Nordica Oxlunga hundgodis 100 g" width="1100" height="1100" decoding="async" fetchpriority="high">
           <button type="button" class="gallery-arrow prev" id="galleryPrev" aria-label="Föregående bild">&#8249;</button>
           <button type="button" class="gallery-arrow next" id="galleryNext" aria-label="Nästa bild">&#8250;</button>
           <div class="gallery-nav" id="galleryDots" role="tablist" aria-label="Produktbilder"></div>
@@ -1062,6 +1156,14 @@
             <div class="nutri-row"><span class="lbl">Råfett</span><span class="dots"></span><span class="val">9,0%</span></div>
             <div class="nutri-row"><span class="lbl">Vatten</span><span class="dots"></span><span class="val">11,2%</span></div>
             <div class="nutri-row"><span class="lbl">Råaska (mineraler)</span><span class="dots"></span><span class="val">4,6%</span></div>
+          </div>
+        </details>
+        <details class="nutri-accordion">
+          <summary>Frakt</summary>
+          <div class="accordion-body">
+            <p><strong>Gratis frakt</strong> vid köp över 499 kr.</p>
+            <p>Vi skickar din order inom <strong>24 timmar</strong> på vardagar.</p>
+            <p>Leverans sker normalt inom <strong>2–5 arbetsdagar</strong>.</p>
           </div>
         </details>
       </div>
@@ -1158,6 +1260,7 @@
 
 
 <div class="cart-overlay" id="cartOverlay" hidden></div>
+<div class="koda-toast" id="kodaToast" role="status" aria-live="polite"></div>
 <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-label="Varukorg">
   <div class="cart-header">
     <h3>Varukorg</h3>
@@ -1165,7 +1268,18 @@
   </div>
   <div class="cart-body" id="cartBody"></div>
   <div class="cart-footer" id="cartFooter" hidden>
-    <div class="cart-total"><span>Totalt</span><strong id="cartTotal">0 kr</strong></div>
+    <div class="cart-promo">
+      <input type="text" id="promoInput" placeholder="Rabattkod" autocomplete="off" aria-label="Rabattkod">
+      <button type="button" id="promoApplyBtn">Använd</button>
+    </div>
+    <p class="cart-promo-msg" id="promoMsg"></p>
+    <div class="cart-summary-rows">
+      <div class="cart-summary-row"><span>Delsumma</span><span id="cartSubtotal">0 kr</span></div>
+      <div class="cart-summary-row" id="cartDiscountRow" hidden><span>Rabatt</span><span id="cartDiscount">−0 kr</span></div>
+      <div class="cart-summary-row"><span>Frakt</span><span id="cartShipping">49 kr</span></div>
+      <div class="cart-summary-row total-row"><span>Totalt</span><strong id="cartTotal">0 kr</strong></div>
+    </div>
+    <p class="cart-shipping-note" id="cartShippingNote"></p>
     <button type="button" class="btn-checkout" id="checkoutBtn">Gå till kassan</button>
     <p class="cart-note">Kassan öppnar vid lansering. Lägg gärna produkten i varukorgen redan nu, så är du redo.</p>
   </div>
@@ -1330,6 +1444,16 @@
     renderGallery();
   });
   renderGallery();
+  // Förladda övriga galleribilder i bakgrunden
+  if ("requestIdleCallback" in window) {
+    requestIdleCallback(() => {
+      galleryImages.slice(1).forEach(g => { const i = new Image(); i.src = g.src; });
+    });
+  } else {
+    setTimeout(() => {
+      galleryImages.slice(1).forEach(g => { const i = new Image(); i.src = g.src; });
+    }, 1200);
+  }
 
   // Touch swipe on gallery
   const galleryEl = document.getElementById("productGallery");
@@ -1387,6 +1511,49 @@
   function cartSum() {
     return cart.reduce((s, i) => s + i.qty * i.price, 0);
   }
+  const SHIPPING_FLAT = 49;
+  const FREE_SHIPPING_AT = 499;
+  const PROMO_CODES = {
+    "KODA10": { type: "percent", value: 10, label: "10 % rabatt" },
+    "VÄLKOMST10": { type: "percent", value: 10, label: "10 % rabatt" },
+    "VALKOMST10": { type: "percent", value: 10, label: "10 % rabatt" },
+    "WELCOME10": { type: "percent", value: 10, label: "10 % rabatt" }
+  };
+  const promoKey = "koda_promo";
+  let appliedPromo = null;
+  try {
+    const saved = localStorage.getItem(promoKey);
+    if (saved && PROMO_CODES[saved]) appliedPromo = saved;
+  } catch {}
+  let hadFreeShipping = false;
+
+  function discountAmount() {
+    const sub = cartSum();
+    if (!appliedPromo || !PROMO_CODES[appliedPromo] || sub <= 0) return 0;
+    const p = PROMO_CODES[appliedPromo];
+    if (p.type === "percent") return Math.round(sub * p.value / 100);
+    if (p.type === "fixed") return Math.min(p.value, sub);
+    return 0;
+  }
+  function amountAfterDiscount() {
+    return Math.max(0, cartSum() - discountAmount());
+  }
+  function shippingCost() {
+    const sub = amountAfterDiscount();
+    if (cartSum() <= 0) return 0;
+    return sub >= FREE_SHIPPING_AT ? 0 : SHIPPING_FLAT;
+  }
+  function cartGrandTotal() {
+    return amountAfterDiscount() + shippingCost();
+  }
+  function showToast(msg) {
+    const el = document.getElementById("kodaToast");
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => el.classList.remove("show"), 2800);
+  }
   function updateCartCount() {
     const n = cartQtyTotal();
     if (!cartCount) return;
@@ -1399,10 +1566,64 @@
     if (cart.length === 0) {
       cartBody.innerHTML = `<div class="cart-empty">Din varukorg är tom.</div>`;
       if (cartFooter) cartFooter.hidden = true;
+      hadFreeShipping = false;
       return;
     }
     if (cartFooter) cartFooter.hidden = false;
-    if (cartTotal) cartTotal.textContent = cartSum() + " kr";
+    const sub = cartSum();
+    const disc = discountAmount();
+    const after = amountAfterDiscount();
+    const ship = shippingCost();
+    const free = ship === 0 && sub > 0;
+    if (free && !hadFreeShipping) {
+      showToast("Du har fått gratis frakt");
+      hadFreeShipping = true;
+    }
+    if (!free) hadFreeShipping = false;
+    const subEl = document.getElementById("cartSubtotal");
+    const shipEl = document.getElementById("cartShipping");
+    const noteEl = document.getElementById("cartShippingNote");
+    const discRow = document.getElementById("cartDiscountRow");
+    const discEl = document.getElementById("cartDiscount");
+    const promoInput = document.getElementById("promoInput");
+    const promoMsg = document.getElementById("promoMsg");
+    if (subEl) subEl.textContent = sub + " kr";
+    if (discRow && discEl) {
+      if (disc > 0 && appliedPromo) {
+        discRow.hidden = false;
+        discRow.removeAttribute("hidden");
+        discEl.textContent = "−" + disc + " kr";
+      } else {
+        discRow.hidden = true;
+        discRow.setAttribute("hidden", "");
+        discEl.textContent = "";
+      }
+    }
+    if (shipEl) shipEl.textContent = free ? "Gratis" : (ship + " kr");
+    if (cartTotal) cartTotal.textContent = cartGrandTotal() + " kr";
+    if (noteEl) {
+      if (free) {
+        noteEl.textContent = "Gratis frakt gäller för denna order.";
+        noteEl.classList.add("free");
+      } else {
+        const left = Math.max(0, FREE_SHIPPING_AT - after);
+        noteEl.textContent = "Köp för " + left + " kr till så får du gratis frakt.";
+        noteEl.classList.remove("free");
+      }
+    }
+    if (promoInput && appliedPromo) promoInput.value = appliedPromo;
+    if (promoMsg) {
+      if (appliedPromo && PROMO_CODES[appliedPromo] && disc > 0) {
+        promoMsg.textContent = "Kod " + appliedPromo + " aktiv (" + PROMO_CODES[appliedPromo].label + ").";
+        promoMsg.className = "cart-promo-msg ok";
+      } else if (!promoMsg.classList.contains("err") || !promoMsg.textContent) {
+        // keep error text if just failed apply; clear when cart re-renders without err intent
+        if (!appliedPromo) {
+          promoMsg.textContent = "";
+          promoMsg.className = "cart-promo-msg";
+        }
+      }
+    }
     cartBody.innerHTML = cart.map(item => `
       <div class="cart-item" data-id="${item.id}">
         <img src="${item.image}" alt="">
@@ -1468,7 +1689,40 @@
     else cart.push({ ...PRODUCT, qty });
     saveCart(cart);
     renderCart();
+    showToast(qty > 1 ? (qty + " st tillagda i varukorgen") : "Tillagd i varukorgen");
     openCart();
+  });
+
+  const promoApplyBtn = document.getElementById("promoApplyBtn");
+  const promoInputEl = document.getElementById("promoInput");
+  function applyPromoCode(raw) {
+    const code = (raw || "").trim().toUpperCase().replace(/Ä/g,"Ä").replace(/Å/g,"Å").replace(/Ö/g,"Ö");
+    // Normalize common variants without diacritics already in map
+    const normalized = code.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const key = PROMO_CODES[code] ? code : (PROMO_CODES[normalized] ? normalized : null);
+    const msg = document.getElementById("promoMsg");
+    if (!key) {
+      appliedPromo = null;
+      try { localStorage.removeItem(promoKey); } catch {}
+      if (msg) { msg.textContent = "Ogiltig rabattkod."; msg.className = "cart-promo-msg err"; }
+      renderCart();
+      return false;
+    }
+    appliedPromo = key;
+    try { localStorage.setItem(promoKey, key); } catch {}
+    if (msg) {
+      msg.textContent = "Kod " + key + " aktiverad (" + PROMO_CODES[key].label + ").";
+      msg.className = "cart-promo-msg ok";
+    }
+    showToast("Rabattkod aktiverad");
+    renderCart();
+    return true;
+  }
+  if (promoApplyBtn) promoApplyBtn.addEventListener("click", () => {
+    applyPromoCode(promoInputEl ? promoInputEl.value : "");
+  });
+  if (promoInputEl) promoInputEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); applyPromoCode(promoInputEl.value); }
   });
 
   const checkoutBtn = document.getElementById("checkoutBtn");
@@ -1476,7 +1730,6 @@
     closeCart();
     const signup = document.getElementById("signup");
     if (signup) signup.scrollIntoView({ behavior: "smooth" });
-    // Soft notice via existing signup section – kassan vid lansering
   });
 
   document.addEventListener("keydown", (e) => {
